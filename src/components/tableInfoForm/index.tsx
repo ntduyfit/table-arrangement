@@ -7,7 +7,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { ITableInfoFormProps } from './types';
 import useToggle from '../../hooks/useToggle';
 
-const TableInfoForm = ({ submitAddTable, targetTable }: ITableInfoFormProps) => {
+const TableInfoForm = ({ submitAddTable, targetTable, isEdit }: ITableInfoFormProps) => {
   const [tableName, setTableName] = useState('');
   const [pax, setPax] = useState(4);
   const [loading, , stopLoading] = useToggle(true);
@@ -38,12 +38,16 @@ const TableInfoForm = ({ submitAddTable, targetTable }: ITableInfoFormProps) => 
           <TextField required label='Table name' value={tableName} onChange={({ target }) => setTableName(target.value)} />
           <TextField required label='Pax' type='number' value={pax} onChange={({ target }) => setPax(Number(target.value))} />
           <Button color='success' onClick={handleSubmit}>
-            Add Table
+            {`${isEdit ? 'Edit' : 'Add'} Table`}
           </Button>
         </Fragment>
       )}
     </Stack>
   );
+};
+
+TableInfoForm.defaultProps = {
+  isEdit: false
 };
 
 export default TableInfoForm;

@@ -4,10 +4,9 @@ import { Group, Rect, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
 
 import { ITableProps } from './types';
-import useToggle from '../../hooks/useToggle';
 import useAddTableHistory from '../../features/tableArrangement/hooks/useAddTableHistory';
 import { StageSize } from '../canvasStage/constants';
-import { getTotalBox } from './utils/sizing';
+import { getClientRect, getTotalBox } from './utils/sizing';
 import { selectTable } from '../../features/tableArrangement/reducer';
 import { AppState } from '../../store';
 
@@ -47,34 +46,33 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
     const boxes = tableSelectionRef.current?.nodes().map((node) => node.getClientRect());
     const box = getTotalBox(boxes!);
 
-    tableSelectionRef.current!.nodes().forEach((shape) => {
-      const absPos = shape.getAbsolutePosition();
-      // where are shapes inside bounding box of all shapes?
-      const offsetX = box.x - absPos.x;
-      const offsetY = box.y - absPos.y;
+    const shape = tableSelectionRef.current!.nodes()[0];
+    const absPos = shape.getAbsolutePosition();
+    // where are shapes inside bounding box of all shapes?
+    const offsetX = box.x - absPos.x;
+    const offsetY = box.y - absPos.y;
 
-      // we total box goes outside of viewport, we need to move absolute position of shape
-      const newAbsPos = { ...absPos };
-      if (box.x < 0) {
-        newAbsPos.x = -offsetX;
-      }
-      if (box.y < 0) {
-        newAbsPos.y = -offsetY;
-      }
-      if (box.x + box.width > StageSize.width) {
-        newAbsPos.x = StageSize.width - box.width - offsetX;
-      }
-      if (box.y + box.height > StageSize.height) {
-        newAbsPos.y = StageSize.height - box.height - offsetY;
-      }
+    // we total box goes outside of viewport, we need to move absolute position of shape
+    const newAbsPos = { ...absPos };
+    if (box.x < 0) {
+      newAbsPos.x = -offsetX;
+    }
+    if (box.y < 0) {
+      newAbsPos.y = -offsetY;
+    }
 
-      shape.setAbsolutePosition(newAbsPos);
-    });
+    if (box.x + box.width > StageSize.width) {
+      newAbsPos.x = StageSize.width - box.width - offsetX;
+    }
+    if (box.y + box.height > StageSize.height) {
+      newAbsPos.y = StageSize.height - box.height - offsetY;
+    }
+
+    shape.setAbsolutePosition(newAbsPos);
   };
 
   const handleDragEnd = () => {
     const node = tableRef.current!;
-    console.log(node);
     updateTableHistory({
       ...table,
       position: {
@@ -137,7 +135,22 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
           fontSize={20}
         />
       </Group>
-      {isSelected && <Transformer ref={tableSelectionRef} rotateEnabled={false} flipEnabled={false} />}
+      {isSelected && (
+        <Transformer
+          ref={tableSelectionRef}
+          rotateEnabled={false}
+          flipEnabled={false}
+          boundBoxFunc={(oldBox, newBox) => {
+            const box = getClientRect(newBox);
+            const isOut = box.x < 0 || box.y < 0 || box.x + box.width > StageSize.width || box.y + box.height > StageSize.height;
+
+            if (isOut) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
     </Fragment>
   );
 };

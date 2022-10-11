@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Layer, Stage } from 'react-konva';
+import { Layer } from 'react-konva';
 
+import { StyledStage } from './styles';
 import { AppState } from '../../store';
 import { StageSize } from './constants';
 import RectangleTable from '../rectangleTable';
@@ -15,13 +16,13 @@ const CanvasStage = () => {
   };
 
   return (
-    <Stage width={StageSize.width} height={StageSize.height} style={{ backgroundColor: 'rgb(250, 250, 250)' }} onClick={handleClick}>
+    <StyledStage width={StageSize.width} height={StageSize.height} onClick={handleClick}>
       <Layer>
         {history[currentStep]?.map((table) => (
           <RectangleTable key={table.name} table={table} />
         ))}
       </Layer>
-    </Stage>
+    </StyledStage>
   );
 };
 

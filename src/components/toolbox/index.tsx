@@ -112,7 +112,7 @@ const Toolbox = (): JSX.Element => {
         </span>
       </Tooltip>
       <TableModal isOpen={isOpenModal} handleClose={closeModal}>
-        <TableInfoForm submitAddTable={submitAddTable} targetTable={targetTable} />
+        <TableInfoForm submitAddTable={submitAddTable} targetTable={targetTable} isEdit={mode === Mode.edit} />
       </TableModal>
     </Box>
   );
