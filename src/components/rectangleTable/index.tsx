@@ -17,11 +17,12 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   const tableRef = useRef<Konva.Group>(null);
   const tableSelectionRef = useRef<Konva.Transformer>(null);
   const [isSelected, setIsSelected] = useState(false);
-  const [isDraggable, enableDraging, disableDragging] = useToggle();
+  const [isDraggable, enableDragging, disableDragging] = useToggle();
   const { updateTableHistory } = useAddTableHistory();
 
   useEffect(() => {
     if (isSelected) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       tableSelectionRef.current?.nodes([tableRef.current!]);
       tableSelectionRef.current?.getLayer()?.batchDraw();
     }
@@ -30,14 +31,17 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   useEffect(() => {
     if (selectedId === table.id) {
       setIsSelected(true);
-      enableDraging();
+      enableDragging();
     } else {
       setIsSelected(false);
       disableDragging();
     }
   }, [selectedId]);
 
-  const handleSelect = () => {
+  const handleSelect = (event: Konva.KonvaEventObject<MouseEvent>) => {
+    // prevent click event bubble up to Stage
+    event.cancelBubble = true;
+
     dispatch(selectTable(table.id));
   };
 
@@ -83,12 +87,6 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   };
 
   const handleTransformEnd = ({ target }: Konva.KonvaEventObject<Event>) => {
-    // Convert scale to height
-    // target.width(target.width() * target.scaleX());
-    // target.height(target.height() * target.scaleY());
-    //
-    // // reset scale and position
-
     updateTableHistory({
       ...table,
       position: {
