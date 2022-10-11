@@ -17,7 +17,6 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   const tableRef = useRef<Konva.Group>(null);
   const tableSelectionRef = useRef<Konva.Transformer>(null);
   const [isSelected, setIsSelected] = useState(false);
-  const [isDraggable, enableDragging, disableDragging] = useToggle();
   const { updateTableHistory } = useAddTableHistory();
 
   useEffect(() => {
@@ -31,10 +30,8 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   useEffect(() => {
     if (selectedId === table.id) {
       setIsSelected(true);
-      enableDragging();
     } else {
       setIsSelected(false);
-      disableDragging();
     }
   }, [selectedId]);
 
@@ -50,33 +47,34 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
     const boxes = tableSelectionRef.current?.nodes().map((node) => node.getClientRect());
     const box = getTotalBox(boxes!);
 
-    const shape = tableSelectionRef.current!.nodes()[0];
+    tableSelectionRef.current!.nodes().forEach((shape) => {
+      const absPos = shape.getAbsolutePosition();
+      // where are shapes inside bounding box of all shapes?
+      const offsetX = box.x - absPos.x;
+      const offsetY = box.y - absPos.y;
 
-    const absPos = shape.getAbsolutePosition();
-    // where are shapes inside bounding box of all shapes?
-    const offsetX = box.x - absPos.x;
-    const offsetY = box.y - absPos.y;
+      // we total box goes outside of viewport, we need to move absolute position of shape
+      const newAbsPos = { ...absPos };
+      if (box.x < 0) {
+        newAbsPos.x = -offsetX;
+      }
+      if (box.y < 0) {
+        newAbsPos.y = -offsetY;
+      }
+      if (box.x + box.width > StageSize.width) {
+        newAbsPos.x = StageSize.width - box.width - offsetX;
+      }
+      if (box.y + box.height > StageSize.height) {
+        newAbsPos.y = StageSize.height - box.height - offsetY;
+      }
 
-    // we total box goes outside of viewport, we need to move absolute position of shape
-    const newAbsPos = { ...absPos };
-    if (box.x < 0) {
-      newAbsPos.x = -offsetX;
-    }
-    if (box.y < 0) {
-      newAbsPos.y = -offsetY;
-    }
-    if (box.x + box.width > StageSize.width) {
-      newAbsPos.x = StageSize.width - box.width - offsetX;
-    }
-    if (box.y + box.height > StageSize.height) {
-      newAbsPos.y = StageSize.height - box.height - offsetY;
-    }
-
-    shape.setAbsolutePosition(newAbsPos);
+      shape.setAbsolutePosition(newAbsPos);
+    });
   };
 
   const handleDragEnd = () => {
     const node = tableRef.current!;
+    console.log(node);
     updateTableHistory({
       ...table,
       position: {
@@ -84,6 +82,8 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
         y: node.y()
       }
     });
+
+    dispatch(selectTable(table.id));
   };
 
   const handleTransformEnd = ({ target }: Konva.KonvaEventObject<Event>) => {
@@ -109,7 +109,8 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
         height={table.height}
         ref={tableRef}
         onClick={handleSelect}
-        draggable={isDraggable}
+        draggable
+        onDragStart={() => setIsSelected(true)}
         onDragEnd={handleDragEnd}
         scaleX={1}
         scaleY={1}
