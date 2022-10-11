@@ -38,7 +38,7 @@ const useAddTableHistory = (): IReturnTypes => {
     dispatch(updateTable(newStep));
   };
 
-  return { updateTableHistory, addTable, removeTable };
+  return { addTable, removeTable, updateTableHistory };
 };
 
 export default useAddTableHistory;

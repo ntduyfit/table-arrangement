@@ -125,7 +125,16 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
           scaleY={1}
           strokeScaleEnabled={false}
         />
-        <Text height={table.height} verticalAlign='middle' text={table.name} width={table.width} align='center' fontSize={20} />
+        <Text
+          height={table.height}
+          verticalAlign='middle'
+          text={`${table.name}\nPax: ${table.pax}`}
+          width={table.width}
+          lineHeight={1.5}
+          wrap='\n'
+          align='center'
+          fontSize={20}
+        />
       </Group>
       {isSelected && <Transformer ref={tableSelectionRef} rotateEnabled={false} flipEnabled={false} />}
     </Fragment>

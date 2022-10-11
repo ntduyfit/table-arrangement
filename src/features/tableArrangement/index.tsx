@@ -12,7 +12,7 @@ const TableArrangement = (): JSX.Element => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const tables: Array<ITable> = [{ name: 'Table 1', pax: 10, position: { x: 10, y: 20 }, height: 50, width: 120, id: 1 }];
+    const tables: Array<ITable> = [{ name: 'Table 1', pax: 10, position: { x: 10, y: 20 }, height: 70, width: 160, id: 1 }];
 
     dispatch(init(tables));
   }, []);

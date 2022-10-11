@@ -6,10 +6,11 @@ import { Provider as ReduxProvider } from 'react-redux';
 import App from './App';
 import './index.css';
 import store from './store';
+import theme from './theme';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Suspense fallback={<div>abc</div>}>
-    <CssVarsProvider>
+    <CssVarsProvider theme={theme}>
       <ReduxProvider store={store}>
         <App />
       </ReduxProvider>
