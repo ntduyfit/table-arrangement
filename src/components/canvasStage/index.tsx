@@ -1,4 +1,3 @@
-import { lazy, memo, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { Layer, Stage } from 'react-konva';
 
