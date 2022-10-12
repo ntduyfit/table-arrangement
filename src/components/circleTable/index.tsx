@@ -1,15 +1,15 @@
 import { Fragment, useContext, useEffect, useRef, useState } from 'react';
-import { Group, Rect, Text, Transformer } from 'react-konva';
+import { Circle, Group, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
 
-import { IRectangleTableProps } from './types';
+import { ICircleTableProps } from './types';
 import useAddTableHistory from '../../features/tableArrangement/hooks/useAddTableHistory';
 import { StageSize } from '../canvasStage/constants';
 import { calculateDrag, getClientRect } from '../../utils/sizing';
 import TableContext from '../../features/tableArrangement/context';
 import { SelectTable } from '../../features/tableArrangement/context/constants';
 
-const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
+const CircleTable = ({ table }: ICircleTableProps): JSX.Element => {
   const { selectedId, dispatch } = useContext(TableContext);
   const tableRef = useRef<Konva.Group>(null);
   const tableSelectionRef = useRef<Konva.Transformer>(null);
@@ -65,8 +65,7 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
         ...table.shape,
         pos_x: target.x(),
         pos_y: target.y(),
-        width: target.width() * target.scaleX(),
-        height: target.height() * target.scaleY()
+        radius: target.width() * target.scaleX()
       }
     });
     target.scaleX(1);
@@ -78,8 +77,8 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
       <Group
         x={table.shape.pos_x}
         y={table.shape.pos_y}
-        width={table.shape.width}
-        height={table.shape.height}
+        width={table.shape.radius}
+        height={table.shape.radius}
         ref={tableRef}
         onClick={handleSelect}
         draggable
@@ -90,20 +89,14 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
         onDragMove={handleDragMove}
         onTransformEnd={handleTransformEnd}
       >
-        <Rect
-          width={table.shape.width}
-          height={table.shape.height}
-          stroke='#096BDE'
-          cornerRadius={4}
-          scaleX={1}
-          scaleY={1}
-          strokeScaleEnabled={false}
-        />
+        <Circle radius={table.shape.radius} stroke='#096BDE' cornerRadius={4} scaleX={1} scaleY={1} strokeScaleEnabled={false} />
         <Text
-          height={table.shape.height}
+          height={table.shape.radius * 2}
           verticalAlign='middle'
+          x={-table.shape.radius}
+          y={-table.shape.radius}
           text={`${table.name}\nPax: ${table.number_of_pax}`}
-          width={table.shape.width}
+          width={table.shape.radius * 2}
           lineHeight={1.5}
           wrap='\n'
           align='center'
@@ -115,7 +108,7 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
           ref={tableSelectionRef}
           rotateEnabled={false}
           flipEnabled={false}
-          keepRatio={false}
+          enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
           boundBoxFunc={(oldBox, newBox) => {
             const box = getClientRect(newBox);
             const isOut = box.x < 0 || box.y < 0 || box.x + box.width > StageSize.width || box.y + box.height > StageSize.height;
@@ -131,4 +124,4 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
   );
 };
 
-export default RectangleTable;
+export default CircleTable;

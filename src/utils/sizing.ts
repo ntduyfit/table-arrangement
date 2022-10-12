@@ -1,5 +1,7 @@
 import { IRect } from 'konva/lib/types';
 import { Box } from 'konva/cmj/shapes/Transformer';
+import Konva from 'konva';
+import { StageSize } from '../components/canvasStage/constants';
 
 const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
   const distance = Math.sqrt(diffX * diffX + diffY * diffY);
@@ -54,4 +56,35 @@ export const getClientRect = (rotatedBox: Box) => {
     width: maxX - minX,
     height: maxY - minY
   };
+};
+
+export const calculateDrag = (transformNodes: Konva.Node[]) => {
+  const transformBox = transformNodes.map((node) => node.getClientRect());
+  const box = getTotalBox(transformBox);
+
+  const shape = transformNodes[0];
+  if (shape) {
+    const absPos = shape.getAbsolutePosition();
+    // where are shapes inside bounding box of all shapes?
+    const offsetX = box.x - absPos.x;
+    const offsetY = box.y - absPos.y;
+
+    // we total box goes outside of viewport, we need to move absolute position of shape
+    const newAbsPos = { ...absPos };
+    if (box.x < 0) {
+      newAbsPos.x = -offsetX;
+    }
+    if (box.y < 0) {
+      newAbsPos.y = -offsetY;
+    }
+
+    if (box.x + box.width > StageSize.width) {
+      newAbsPos.x = StageSize.width - box.width - offsetX;
+    }
+    if (box.y + box.height > StageSize.height) {
+      newAbsPos.y = StageSize.height - box.height - offsetY;
+    }
+
+    shape.setAbsolutePosition(newAbsPos);
+  }
 };
