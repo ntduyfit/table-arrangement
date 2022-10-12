@@ -1,9 +1,9 @@
 import { Dispatch } from 'react';
 
-import { ITable } from '../../../types/table';
+import { ICircleTable, IRectangleTable } from '../../../types/table';
 
 export interface ITableReducer {
-  history: Array<Array<ITable>>;
+  history: Array<Array<IRectangleTable | ICircleTable>>;
   selectedId: number;
   currentStep: number;
 }

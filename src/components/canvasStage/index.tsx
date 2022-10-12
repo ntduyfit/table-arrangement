@@ -1,20 +1,16 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Layer } from 'react-konva';
 
 import { StyledStage } from './styles';
 import { StageSize } from './constants';
 import RectangleTable from '../rectangleTable';
 import TableContext from '../../features/tableArrangement/context';
-import { InitTable, SelectTable } from '../../features/tableArrangement/context/constants';
-import { ITable } from '../../types/table';
+import { SelectTable } from '../../features/tableArrangement/context/constants';
+import { ICircleTable, IRectangleTable } from '../../types/table';
+import CircleTable from '../circleTable';
 
 const CanvasStage = () => {
   const { currentStep, history, dispatch } = useContext(TableContext);
-
-  useEffect(() => {
-    const tables: Array<ITable> = [{ name: 'Table 1', pax: 10, pos_x: 10, pos_y: 20, height: 70, width: 160, id: 1 }];
-    dispatch({ type: InitTable, payload: tables });
-  }, []);
 
   const handleClick = () => {
     dispatch({ type: SelectTable, payload: 0 });
@@ -23,9 +19,16 @@ const CanvasStage = () => {
   return (
     <StyledStage width={StageSize.width} height={StageSize.height} onClick={handleClick}>
       <Layer>
-        {history[currentStep]?.map((table) => (
-          <RectangleTable key={table.name} table={table} />
-        ))}
+        {history[currentStep]?.map((table) => {
+          switch (table.type) {
+            case 'rectangle':
+              return <RectangleTable key={table.id} table={table as IRectangleTable} />;
+            case 'circle':
+              return <CircleTable key={table.id} table={table as ICircleTable} />;
+            default:
+              return null;
+          }
+        })}
       </Layer>
     </StyledStage>
   );

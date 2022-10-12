@@ -14,13 +14,13 @@ const TableInfoForm = ({ submitAddTable, targetTable, isEdit }: ITableInfoFormPr
 
   useEffect(() => {
     setTableName(targetTable.name);
-    setPax(targetTable.pax);
+    setPax(targetTable.number_of_pax);
 
     stopLoading();
   }, []);
 
   const handleSubmit = () => {
-    submitAddTable({ ...targetTable, name: tableName, pax });
+    submitAddTable({ ...targetTable, name: tableName, number_of_pax: pax });
   };
 
   return (

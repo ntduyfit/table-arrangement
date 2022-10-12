@@ -1,5 +1,5 @@
-import { ITable } from '../../types/table';
+import { IRectangleTable } from '../../types/table';
 
-export interface ITableProps {
-  table: ITable;
+export interface IRectangleTableProps {
+  table: IRectangleTable;
 }

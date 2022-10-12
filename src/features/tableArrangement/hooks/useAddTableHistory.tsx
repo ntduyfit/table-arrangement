@@ -1,12 +1,12 @@
 import { useContext } from 'react';
-import { ITable } from '../../../types/table';
+import { ICircleTable, IRectangleTable } from '../../../types/table';
 import TableContext from '../context';
 import { UpdateHistory } from '../context/constants';
 
 interface IReturnTypes {
-  updateTableHistory: (table: ITable) => void;
+  updateTableHistory: (table: IRectangleTable | ICircleTable) => void;
 
-  addTable: (table: ITable) => void;
+  addTable: (table: IRectangleTable | ICircleTable) => void;
 
   removeTable: () => void;
 }
@@ -14,7 +14,7 @@ interface IReturnTypes {
 const useAddTableHistory = (): IReturnTypes => {
   const { history, currentStep, selectedId, dispatch } = useContext(TableContext);
 
-  const updateTableHistory = (table: ITable) => {
+  const updateTableHistory = (table: IRectangleTable | ICircleTable) => {
     const currentHistory = [...history[currentStep]];
     const newStep = currentHistory.filter((item) => item.id !== table.id);
     newStep.push(table);
@@ -22,7 +22,7 @@ const useAddTableHistory = (): IReturnTypes => {
     dispatch({ type: UpdateHistory, payload: newStep });
   };
 
-  const addTable = (table: ITable) => {
+  const addTable = (table: IRectangleTable | ICircleTable) => {
     const newStep = [...history[currentStep]];
     newStep.push(table);
 
