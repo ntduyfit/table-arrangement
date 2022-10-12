@@ -7,7 +7,8 @@ export interface ITable {
   id: number;
   name: string;
   pax: number;
-  position: IPosition;
+  pos_x: number;
+  pos_y: number;
   width: number;
   height: number;
 }

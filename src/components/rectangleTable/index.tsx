@@ -1,5 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { Group, Rect, Text, Transformer } from 'react-konva';
 import Konva from 'konva';
 
@@ -7,12 +6,11 @@ import { ITableProps } from './types';
 import useAddTableHistory from '../../features/tableArrangement/hooks/useAddTableHistory';
 import { StageSize } from '../canvasStage/constants';
 import { getClientRect, getTotalBox } from './utils/sizing';
-import { selectTable } from '../../features/tableArrangement/reducer';
-import { AppState } from '../../store';
+import TableContext from '../../features/tableArrangement/context';
+import { SelectTable } from '../../features/tableArrangement/context/constants';
 
 const RectangleTable = ({ table }: ITableProps): JSX.Element => {
-  const dispatch = useDispatch();
-  const { selectedId } = useSelector((state: AppState) => state.tables);
+  const { selectedId, dispatch } = useContext(TableContext);
   const tableRef = useRef<Konva.Group>(null);
   const tableSelectionRef = useRef<Konva.Transformer>(null);
   const [isSelected, setIsSelected] = useState(false);
@@ -38,7 +36,7 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
     // prevent click event bubble up to Stage
     event.cancelBubble = true;
 
-    dispatch(selectTable(table.id));
+    dispatch({ type: SelectTable, payload: table.id });
   };
 
   // Ensure table is always limited on stage
@@ -47,50 +45,48 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
     const box = getTotalBox(boxes!);
 
     const shape = tableSelectionRef.current!.nodes()[0];
-    const absPos = shape.getAbsolutePosition();
-    // where are shapes inside bounding box of all shapes?
-    const offsetX = box.x - absPos.x;
-    const offsetY = box.y - absPos.y;
+    if (shape) {
+      const absPos = shape.getAbsolutePosition();
+      // where are shapes inside bounding box of all shapes?
+      const offsetX = box.x - absPos.x;
+      const offsetY = box.y - absPos.y;
 
-    // we total box goes outside of viewport, we need to move absolute position of shape
-    const newAbsPos = { ...absPos };
-    if (box.x < 0) {
-      newAbsPos.x = -offsetX;
-    }
-    if (box.y < 0) {
-      newAbsPos.y = -offsetY;
-    }
+      // we total box goes outside of viewport, we need to move absolute position of shape
+      const newAbsPos = { ...absPos };
+      if (box.x < 0) {
+        newAbsPos.x = -offsetX;
+      }
+      if (box.y < 0) {
+        newAbsPos.y = -offsetY;
+      }
 
-    if (box.x + box.width > StageSize.width) {
-      newAbsPos.x = StageSize.width - box.width - offsetX;
-    }
-    if (box.y + box.height > StageSize.height) {
-      newAbsPos.y = StageSize.height - box.height - offsetY;
-    }
+      if (box.x + box.width > StageSize.width) {
+        newAbsPos.x = StageSize.width - box.width - offsetX;
+      }
+      if (box.y + box.height > StageSize.height) {
+        newAbsPos.y = StageSize.height - box.height - offsetY;
+      }
 
-    shape.setAbsolutePosition(newAbsPos);
+      shape.setAbsolutePosition(newAbsPos);
+    }
   };
 
   const handleDragEnd = () => {
     const node = tableRef.current!;
     updateTableHistory({
       ...table,
-      position: {
-        x: node.x(),
-        y: node.y()
-      }
+      pos_x: node.x(),
+      pos_y: node.y()
     });
 
-    dispatch(selectTable(table.id));
+    dispatch({ type: SelectTable, payload: table.id });
   };
 
   const handleTransformEnd = ({ target }: Konva.KonvaEventObject<Event>) => {
     updateTableHistory({
       ...table,
-      position: {
-        x: target.x(),
-        y: target.y()
-      },
+      pos_x: target.x(),
+      pos_y: target.y(),
       width: target.width() * target.scaleX(),
       height: target.height() * target.scaleY()
     });
@@ -101,8 +97,8 @@ const RectangleTable = ({ table }: ITableProps): JSX.Element => {
   return (
     <Fragment>
       <Group
-        x={table.position.x}
-        y={table.position.y}
+        x={table.pos_x}
+        y={table.pos_y}
         width={table.width}
         height={table.height}
         ref={tableRef}

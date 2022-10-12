@@ -1,8 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
-
-import { AppState } from '../../../store';
-import { updateTable } from '../reducer';
+import { useContext } from 'react';
 import { ITable } from '../../../types/table';
+import TableContext from '../context';
+import { UpdateHistory } from '../context/constants';
 
 interface IReturnTypes {
   updateTableHistory: (table: ITable) => void;
@@ -13,29 +12,28 @@ interface IReturnTypes {
 }
 
 const useAddTableHistory = (): IReturnTypes => {
-  const { history, currentStep, selectedId } = useSelector((state: AppState) => state.tables);
-  const dispatch = useDispatch();
+  const { history, currentStep, selectedId, dispatch } = useContext(TableContext);
 
   const updateTableHistory = (table: ITable) => {
     const currentHistory = [...history[currentStep]];
     const newStep = currentHistory.filter((item) => item.id !== table.id);
     newStep.push(table);
 
-    dispatch(updateTable(newStep));
+    dispatch({ type: UpdateHistory, payload: newStep });
   };
 
   const addTable = (table: ITable) => {
-    const currentHistory = [...history[currentStep]];
-    currentHistory.push(table);
+    const newStep = [...history[currentStep]];
+    newStep.push(table);
 
-    dispatch(updateTable(currentHistory));
+    dispatch({ type: UpdateHistory, payload: newStep });
   };
 
   const removeTable = () => {
     const currentHistory = [...history[currentStep]];
     const newStep = currentHistory.filter((item) => item.id !== selectedId);
 
-    dispatch(updateTable(newStep));
+    dispatch({ type: UpdateHistory, payload: newStep });
   };
 
   return { addTable, removeTable, updateTableHistory };
