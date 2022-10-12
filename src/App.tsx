@@ -7,7 +7,7 @@ const TableArrangement = lazy(() => import('./features/tableArrangement'));
 
 function App() {
   return (
-    <Container>
+    <Container maxWidth='xl'>
       <ModeToggle />
       <TableArrangement />
     </Container>

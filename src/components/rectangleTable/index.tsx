@@ -8,6 +8,7 @@ import { StageSize } from '../canvasStage/constants';
 import { calculateDrag, getClientRect } from '../../utils/sizing';
 import TableContext from '../../features/tableArrangement/context';
 import { SelectTable } from '../../features/tableArrangement/context/constants';
+import { TableMinHeight, TableMinWidth } from './constants';
 
 const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
   const { selectedId, dispatch } = useContext(TableContext);
@@ -118,6 +119,14 @@ const RectangleTable = ({ table }: IRectangleTableProps): JSX.Element => {
           keepRatio={false}
           boundBoxFunc={(oldBox, newBox) => {
             const box = getClientRect(newBox);
+            if (Math.abs(newBox.width) < TableMinWidth) {
+              return oldBox;
+            }
+
+            if (Math.abs(newBox.height) < TableMinHeight) {
+              return oldBox;
+            }
+
             const isOut = box.x < 0 || box.y < 0 || box.x + box.width > StageSize.width || box.y + box.height > StageSize.height;
 
             if (isOut) {

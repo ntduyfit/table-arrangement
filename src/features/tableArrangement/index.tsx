@@ -8,7 +8,7 @@ const CanvasStage = lazy(() => import('../../components/canvasStage'));
 const TableArrangement = (): JSX.Element => {
   return (
     <TableContextProvider>
-      <Box display='flex' flexDirection='column'>
+      <Box display='flex' flexDirection='column' width='100%'>
         <Toolbox />
         <CanvasStage />
       </Box>

@@ -1,6 +1,7 @@
 import { lazy, useContext, useState } from 'react';
 import Box from '@mui/joy/Box';
 import IconButton from '@mui/joy/IconButton';
+import Button from '@mui/joy/Button';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -79,8 +80,12 @@ const Toolbox = (): JSX.Element => {
     showModal();
   };
 
+  const handleSave = () => {
+    console.log(history[currentStep]);
+  };
+
   return (
-    <Box display='flex' sx={{ '--IconButton-margin': '8px' }}>
+    <Box display='flex' sx={{ '--IconButton-margin': '8px' }} width={1200}>
       <Tooltip title='Add a new table'>
         <IconButton variant='solid' onClick={changeToAddMode}>
           <AddIcon />
@@ -114,6 +119,11 @@ const Toolbox = (): JSX.Element => {
           </IconButton>
         </span>
       </Tooltip>
+      <Box flexGrow={1} display='flex' justifyContent='flex-end'>
+        <Button size='sm' sx={{ margin: 1 }} onClick={handleSave}>
+          Save
+        </Button>
+      </Box>
       <TableModal isOpen={isOpenModal} handleClose={closeModal}>
         <TableInfoForm submitAddTable={submitAddTable} targetTable={targetTable} isEdit={mode === Mode.edit} />
       </TableModal>

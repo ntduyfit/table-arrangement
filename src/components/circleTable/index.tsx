@@ -8,6 +8,7 @@ import { StageSize } from '../canvasStage/constants';
 import { calculateDrag, getClientRect } from '../../utils/sizing';
 import TableContext from '../../features/tableArrangement/context';
 import { SelectTable } from '../../features/tableArrangement/context/constants';
+import { TableMinRadius } from './constants';
 
 const CircleTable = ({ table }: ICircleTableProps): JSX.Element => {
   const { selectedId, dispatch } = useContext(TableContext);
@@ -112,6 +113,11 @@ const CircleTable = ({ table }: ICircleTableProps): JSX.Element => {
           boundBoxFunc={(oldBox, newBox) => {
             const box = getClientRect(newBox);
             const isOut = box.x < 0 || box.y < 0 || box.x + box.width > StageSize.width || box.y + box.height > StageSize.height;
+
+            // boxWidth = 2 x radius
+            if (Math.abs(newBox.width) < TableMinRadius * 2) {
+              return oldBox;
+            }
 
             if (isOut) {
               return oldBox;
